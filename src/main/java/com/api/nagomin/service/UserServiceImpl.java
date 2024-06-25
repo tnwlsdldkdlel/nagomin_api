@@ -19,8 +19,8 @@ import lombok.extern.log4j.Log4j2;
 @Transactional(readOnly = true)
 @Log4j2
 public class UserServiceImpl implements UserService {
-	
-	private final  UserRepository userRepository;
+
+	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
 
 	@Transactional

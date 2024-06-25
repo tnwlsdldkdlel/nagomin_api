@@ -15,13 +15,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.encrypt.AesBytesEncryptor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
-import com.api.nagomin.security.JwtAuthenticationFilter;
-import com.api.nagomin.security.JwtTokenProvider;
 
 import lombok.RequiredArgsConstructor;
 
@@ -32,7 +28,7 @@ public class SecurityConfig {
 	@Value("${value.encryptor.key}")
 	private String key;
 
-	private final JwtTokenProvider jwtTokenProvider;
+	//private final JwtTokenProvider jwtTokenProvider;
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
@@ -42,8 +38,8 @@ public class SecurityConfig {
 		httpSecurity
 				.sessionManagement(sessionConfig -> sessionConfig.sessionCreationPolicy(SessionCreationPolicy.NEVER));
 		httpSecurity.csrf(config -> config.disable());
-		httpSecurity.addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
-		UsernamePasswordAuthenticationFilter.class);
+		//httpSecurity.addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
+		//UsernamePasswordAuthenticationFilter.class);
 		return httpSecurity.build();
 	}
 

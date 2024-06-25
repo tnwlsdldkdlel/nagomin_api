@@ -43,7 +43,6 @@ public class UserController extends BaseController {
 	public ResultDto<User> save(@Valid @RequestBody JoinDto joinDto, BindingResult result) {
 		isEmpty(result);
 		
-		userService.save(joinDto);
-		return ResultDto.success(null, ResponseCode.SUCCESS.getMessage());
+		return ResultDto.success(userService.save(joinDto), ResponseCode.SUCCESS.getMessage());
 	}
 }
