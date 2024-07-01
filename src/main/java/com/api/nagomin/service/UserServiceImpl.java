@@ -81,6 +81,7 @@ public class UserServiceImpl implements UserService {
 		}	
 	}
 
+	@Transactional
 	@Override
 	public void validateEmail(UserVerificationDto userVerificationDto) {
 		String code = userVerificationDto.convertCode();
