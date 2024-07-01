@@ -12,7 +12,6 @@ spring:
       hibernate:
  # show_sql: true
         format_sql: true
-        
   mvc:
     hiddenmethod:
       filter:
@@ -23,7 +22,24 @@ spring:
       max-file-size: 10MB
       max-request-size: 30MB
       location: upload
-        
+  mail:
+    host: smtp.naver.com
+    port: 465
+    username: tnwls2dkdlel@naver.com
+    password: tnwls5722!
+    properties:
+      mail:
+        smtp:
+         auth: true
+         ssl:
+           enable: true
+         starttls:
+           enable: true
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      password: tnwls5722!
 logging.level:
   org.hibernate.SQL: debug
   org.springframework.security.web: trace
@@ -33,3 +49,4 @@ value:
     key : gkI9QE2yo147b70 
   jwt:
     key : VlwEyVBsYt9V7zq57TejMnVUyzblYcfPQye08f7MGVA9XkHa
+    

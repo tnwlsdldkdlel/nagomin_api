@@ -16,10 +16,12 @@ public enum ResponseCode {
 	// 200 
 	SUCCESS(HttpStatus.OK, true, "데이터 조회 성공."),
 	
-	// 400
+	// 400 BAD_REQUEST
 	BAD_REQUEST(HttpStatus.BAD_REQUEST, true, "잘못된 요청."),
-	BAD_TOKEN(HttpStatus.BAD_REQUEST, false, "유효하지 않은 토큰."),
-	BAD_EXPIRED_TOKEN(HttpStatus.BAD_REQUEST, false, "만료된 토큰."),
+	BAD_DATA(HttpStatus.BAD_REQUEST, false, "유효하지 않은 데이터."),
+	
+	// 401 UNAUTHORIZED
+	UNAUTHORIZED(HttpStatus.UNAUTHORIZED, false, "만료된 데이터."),
 	
 	// 404 Not Found
 	NOT_FOUND(HttpStatus.NOT_FOUND, false, "존재하지 않은 데이터."),

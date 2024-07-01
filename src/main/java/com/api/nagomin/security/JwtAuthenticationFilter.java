@@ -1,10 +1,6 @@
 package com.api.nagomin.security;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.nio.charset.StandardCharsets;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -12,8 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.api.nagomin.dto.ResultDto;
-import com.api.nagomin.util.ResponseCode;
+import com.api.nagomin.util.JwtUtils;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -27,7 +22,7 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-	private final JwtTokenProvider jwtTokenProvider;
+	private final JwtUtils jwtUtils;
 
 	private String getJWTtoken(HttpServletRequest request) {
 		String bearerToken = request.getHeader("Authorization");
@@ -43,21 +38,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			throws ServletException, IOException {
 		// JWT 토큰 추출
 		String token = getJWTtoken((HttpServletRequest) request);
-		
-		// 토큰 유효성 검사
-		if (token == null || !jwtTokenProvider.validateToken(token)) {
-			response.setContentType("application/json");
-			response.setCharacterEncoding("UTF-8");
-			OutputStream outputStream = response.getOutputStream();
-			PrintWriter printWriter = new PrintWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8));
-			printWriter.println(ResultDto.fail(ResponseCode.BAD_TOKEN, null).toJsonString());
-			printWriter.flush();
-			printWriter.close();
-		} else {
-			Authentication authentication = jwtTokenProvider.getAuthentication(token);
-			SecurityContextHolder.getContext().setAuthentication(authentication);
-		}
 
+		// 토큰 유효성 검사
+		jwtUtils.validateToken(token);
+		Authentication authentication = jwtUtils.getAuthentication(token);
+		SecurityContextHolder.getContext().setAuthentication(authentication);
+		
 		filterChain.doFilter(request, response);
 	}
 

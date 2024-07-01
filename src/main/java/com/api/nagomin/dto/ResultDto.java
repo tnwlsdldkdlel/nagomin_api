@@ -28,6 +28,10 @@ public class ResultDto<T> {
 	public static <T> ResultDto<T> success(T data, String message) {
 		return new ResultDto<T>(200, message, data);
 	}
+	
+	public static <T> ResultDto<T> success(String message) {
+		return new ResultDto<T>(200, message, null);
+	}
 
 	public static <T> ResultDto<T> fail(ResponseCode responseCode, T data) {
 		return new ResultDto<T>(responseCode.getHttpStatusCode(), responseCode.getMessage(), data);

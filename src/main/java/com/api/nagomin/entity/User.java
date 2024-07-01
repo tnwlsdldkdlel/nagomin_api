@@ -3,6 +3,7 @@ package com.api.nagomin.entity;
 import java.util.List;
 
 import com.api.nagomin.util.StringListConverter;
+import com.api.nagomin.util.Util;
 import com.api.nagomin.util.Values.TORF;
 
 import jakarta.persistence.Column;
@@ -68,6 +69,16 @@ public class User {
 		this.isVerified = isVerified;
 		this.createdAt = createdAt;
 		this.updatedAt = updatedAt;
+	}
+	
+	public void updateEmail(String email) {
+		this.email = email;
+		this.updatedAt = Util.createdAt();
+	}
+	
+	public void updateIsVerified() {
+		this.isVerified = TORF.T;
+		this.updatedAt = Util.createdAt();
 	}
 
 }

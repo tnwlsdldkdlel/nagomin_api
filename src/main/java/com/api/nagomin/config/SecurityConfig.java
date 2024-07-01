@@ -19,6 +19,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @Configuration
@@ -27,8 +28,6 @@ import lombok.RequiredArgsConstructor;
 public class SecurityConfig {
 	@Value("${value.encryptor.key}")
 	private String key;
-
-	//private final JwtTokenProvider jwtTokenProvider;
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
@@ -40,6 +39,12 @@ public class SecurityConfig {
 		httpSecurity.csrf(config -> config.disable());
 		//httpSecurity.addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
 		//UsernamePasswordAuthenticationFilter.class);
+		httpSecurity.exceptionHandling()
+			.authenticationEntryPoint((request, response, authException) -> {
+				response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+			});
+			
+		
 		return httpSecurity.build();
 	}
 
@@ -55,7 +60,7 @@ public class SecurityConfig {
 		configuration.setAllowedOriginPatterns(Arrays.asList("*")); // 모두 허용
 		configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS"));
 		configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
-		configuration.setAllowCredentials(true);
+		configuration.setAllowCredentials(true); // 쿠키 전송 허용
 
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		source.registerCorsConfiguration("/**", configuration);
