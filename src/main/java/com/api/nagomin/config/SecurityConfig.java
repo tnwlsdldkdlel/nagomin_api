@@ -19,7 +19,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @Configuration
@@ -36,14 +35,7 @@ public class SecurityConfig {
 		});
 		httpSecurity
 				.sessionManagement(sessionConfig -> sessionConfig.sessionCreationPolicy(SessionCreationPolicy.NEVER));
-		httpSecurity.csrf(config -> config.disable());
-		//httpSecurity.addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
-		//UsernamePasswordAuthenticationFilter.class);
-		httpSecurity.exceptionHandling()
-			.authenticationEntryPoint((request, response, authException) -> {
-				response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
-			});
-			
+		httpSecurity.csrf(config -> config.disable());	
 		
 		return httpSecurity.build();
 	}

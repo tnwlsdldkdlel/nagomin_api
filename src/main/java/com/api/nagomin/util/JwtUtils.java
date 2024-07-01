@@ -2,7 +2,9 @@ package com.api.nagomin.util;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -29,6 +31,7 @@ import lombok.extern.log4j.Log4j2;
 public class JwtUtils {
 	private final Key key;
 	private final CustomUserDetailService customUserDetailService;
+	private final Set<String> blacklist = new HashSet<>();
 
 	public JwtUtils(@Value("${value.jwt.key}") String secretKey, CustomUserDetailService customUserDetailService) {
 		byte[] keyBytes = Decoders.BASE64.decode(secretKey);
@@ -38,11 +41,8 @@ public class JwtUtils {
 
 	public String generateToken(Map<String, Object> map) {
 		// 권한 가져오기
-//		String authorities = authentication.getAuthorities().stream()
-//				.map(GrantedAuthority::getAuthority)
-//				.collect(Collectors.joining(","));
-
 		long now = (new Date()).getTime();
+		
 		// 하루로 설정.
 		Date expiration = new Date(now + (24 * 60 * 60 * 1000));
 		String jwt = Jwts.builder()
@@ -63,8 +63,12 @@ public class JwtUtils {
 
 	public boolean validateToken(String token) {
 		try {
-			Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
-			return true;
+			if(this.isTokenBlacklisted(token)) {
+				throw new InvalidDataException("유효하지않은 토큰.");
+			} else {
+				Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+				return true;
+			}
 		} catch (SecurityException | MalformedJwtException | UnsupportedJwtException | IllegalArgumentException e) {
 			throw new InvalidDataException("유효하지않은 토큰.");
 		} catch (ExpiredJwtException e) {
@@ -85,5 +89,12 @@ public class JwtUtils {
 			return e.getClaims();
 		}
 	}
-
+	
+    public void blacklistToken(String token) {
+    	blacklist.add(token);
+    }
+    
+    public boolean isTokenBlacklisted(String token) {
+        return blacklist.contains(token);
+    }
 }
