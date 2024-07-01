@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.api.nagomin.dto.JoinDto;
+import com.api.nagomin.dto.LoginDto;
 import com.api.nagomin.dto.ResultDto;
 import com.api.nagomin.dto.UpdateEmailDto;
 import com.api.nagomin.dto.UserVerificationDto;
@@ -65,6 +66,11 @@ public class UserController extends BaseController {
 	public ResultDto<?> info(@RequestBody UpdateEmailDto updateEmail) {
 		userService.updateEmail(updateEmail);
 		return ResultDto.success(ResponseCode.SUCCESS.getMessage());
-	} 
+	}
+	
+	@PostMapping("login")
+	public ResultDto<?> login(@RequestBody LoginDto loginDto) {
+		return ResultDto.success(userService.login(loginDto), ResponseCode.SUCCESS.getMessage());
+	}
 	
 }
