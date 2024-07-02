@@ -89,6 +89,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		if (path.startsWith("/v1/user/interest")) {
 			return true;
 		}
+		
+		if (path.startsWith("/v1/user/info/email")) {
+			return true;
+		}
+		
+		if (path.startsWith("/v1/user/info/id")) {
+			return true;
+		}
+		
+		if (path.startsWith("/v1/user/info/password")) {
+			return true;
+		}
+		
+		if (path.startsWith("/v1/user/info/validate/email")) {
+			return true;
+		}
+
 
 		return false;
 	}

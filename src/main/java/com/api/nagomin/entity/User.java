@@ -81,4 +81,8 @@ public class User {
 		this.updatedAt = Util.createdAt();
 	}
 
+	public void updatePassword(String password) {
+		this.password = password;
+		this.updatedAt = Util.createdAt();
+	}
 }

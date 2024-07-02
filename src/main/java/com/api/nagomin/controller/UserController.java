@@ -9,8 +9,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.api.nagomin.dto.FindInfoDto;
 import com.api.nagomin.dto.JoinDto;
 import com.api.nagomin.dto.LoginDto;
+import com.api.nagomin.dto.NewPasswordDto;
 import com.api.nagomin.dto.ResultDto;
 import com.api.nagomin.dto.UpdateEmailDto;
 import com.api.nagomin.dto.UserVerificationDto;
@@ -42,7 +44,7 @@ public class UserController extends BaseController {
 
 	@PostMapping("join")
 	public ResultDto<?> save(@RequestBody JoinDto joinDto, BindingResult result, HttpServletResponse response) {
-        return ResultDto.success(userService.save(joinDto), ResponseCode.SUCCESS.getMessage());
+		return ResultDto.success(userService.save(joinDto), ResponseCode.SUCCESS.getMessage());
 	}
 
 	@PostMapping("validate/email")
@@ -50,7 +52,7 @@ public class UserController extends BaseController {
 		userService.validateEmail(userVerificationDto);
 		return ResultDto.success(ResponseCode.SUCCESS.getMessage());
 	}
-	
+
 	@GetMapping("validate/email/{email}")
 	public ResultDto<?> resendEmail(@PathVariable(name = "email") String email) {
 		userService.resendEmail(email);
@@ -61,16 +63,37 @@ public class UserController extends BaseController {
 	public ResultDto<?> updateEmail(@RequestBody UpdateEmailDto updateEmail) {
 		return ResultDto.success(userService.updateEmail(updateEmail), ResponseCode.SUCCESS.getMessage());
 	}
-	
+
 	@GetMapping("info")
 	public ResultDto<?> info(@RequestBody UpdateEmailDto updateEmail) {
 		userService.updateEmail(updateEmail);
 		return ResultDto.success(ResponseCode.SUCCESS.getMessage());
 	}
+
+	@PostMapping("info/id") // 아이디 찾기
+	public ResultDto<?> findId(@RequestBody FindInfoDto findInfoDto) {
+		return ResultDto.success(userService.findId(findInfoDto), ResponseCode.SUCCESS.getMessage());
+	}
 	
+	@GetMapping("info/validate/email/{id}") // 이메일 보내기
+	public ResultDto<?> sendEmail(@PathVariable(name = "id") String id) {
+		return ResultDto.success(userService.sendEmail(id), ResponseCode.SUCCESS.getMessage());
+	}
+	
+	@PostMapping("info/validate/email") // 인증코드 맞는지 확인
+	public ResultDto<?> sendEmail(@RequestBody UserVerificationDto userVerificationDto) {
+		return ResultDto.success(userService.validateEmailForLogin(userVerificationDto), ResponseCode.SUCCESS.getMessage());
+	}
+	
+	@PostMapping("info/password") // 비밀번호 변경
+	public ResultDto<?> resetPassword(@RequestBody NewPasswordDto newPasswordDto) {
+		userService.resetPassword(newPasswordDto);
+		return ResultDto.success(ResponseCode.SUCCESS.getMessage());
+	}
+
 	@PostMapping("login")
 	public ResultDto<?> login(@RequestBody LoginDto loginDto) {
 		return ResultDto.success(userService.login(loginDto), ResponseCode.SUCCESS.getMessage());
 	}
-	
+
 }

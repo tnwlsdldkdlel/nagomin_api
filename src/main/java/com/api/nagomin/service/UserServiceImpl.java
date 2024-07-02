@@ -1,5 +1,7 @@
 package com.api.nagomin.service;
 
+import java.util.Map;
+
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -7,15 +9,18 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.api.nagomin.dto.FindInfoDto;
 import com.api.nagomin.dto.JoinDto;
 import com.api.nagomin.dto.LoginDto;
 import com.api.nagomin.dto.MailDto;
+import com.api.nagomin.dto.NewPasswordDto;
 import com.api.nagomin.dto.UpdateEmailDto;
 import com.api.nagomin.dto.UserVerificationDto;
 import com.api.nagomin.entity.User;
 import com.api.nagomin.exception.AlreadyExistsException;
 import com.api.nagomin.exception.ExpiredDataException;
 import com.api.nagomin.exception.InvalidDataException;
+import com.api.nagomin.exception.NotFoundException;
 import com.api.nagomin.repository.UserRepository;
 import com.api.nagomin.security.CustomUser;
 import com.api.nagomin.util.JwtUtils;
@@ -96,9 +101,8 @@ public class UserServiceImpl implements UserService {
 				user.updateIsVerified();
 			}
 		} else {
-			throw new ExpiredDataException("만료된 코드");
+			throw new ExpiredDataException("만료된 코드.");
 		}
-		
 	}
 
 	@Override
@@ -137,7 +141,7 @@ public class UserServiceImpl implements UserService {
 		} else {
 			// 이메일 업데이트.
 			User user = userRepository.findById(customUser.getSeq())
-					.orElseThrow(() -> new InvalidDataException("유효하지 않은 데이터"));
+					.orElseThrow(() -> new InvalidDataException("유효하지 않은 데이터."));
 			
 			user.updateEmail(updateEmailDto.getUpdateEmail());
 			customUser.setEmail(updateEmailDto.getUpdateEmail());
@@ -162,6 +166,58 @@ public class UserServiceImpl implements UserService {
 		loginDto.setJwt(jwtUtils.generateToken(customUser.getClaims()));
 		
 		return loginDto;
+	}
+
+	@Override
+	public Map<String, Object> findId(FindInfoDto findInfoDto) {
+		User user = userRepository.findByEmail(findInfoDto.getEmail());
+		
+		if(user == null) {
+			throw new NotFoundException("존재하지 않은 이메일.");
+		}
+		
+		return Util.oneDataToMap("id", userRepository.findByEmail(findInfoDto.getEmail()).getId());
+	}
+
+	@Override
+	public Map<String, Object> sendEmail(String id) {
+		User user = userRepository.findById(id);
+		
+		resendEmail(user.getEmail());
+		
+		return Util.oneDataToMap("email", user.getEmail());
+	}
+
+	@Transactional
+	@Override
+	public void resetPassword(NewPasswordDto newPasswordDto) {
+		User user = userRepository.findById(newPasswordDto.getSeq())
+				.orElseThrow(() -> new NotFoundException("존재하지 않은 유저."));
+		
+		if(newPasswordDto.getPassword1().equals(newPasswordDto.getPassword2())) {
+			user.updatePassword(passwordEncoder.encode(newPasswordDto.getPassword1()));	
+		} else {
+			throw new InvalidDataException("유혀하지 않은 데이터.");
+		}
+	}
+
+	@Override
+	public Map<String, Object> validateEmailForLogin(UserVerificationDto userVerificationDto) {
+		String code = userVerificationDto.convertCode();
+		
+		// 해당 key가 없으면 만료된 코드, 있으면 같은지 확인.
+		if(redisUtils.existData(userVerificationDto.getEmail())) {
+			String checkCode = redisUtils.getData(userVerificationDto.getEmail());
+			
+			if(!checkCode.equals(code)) {
+				throw new InvalidDataException("유효하지않은 코드.");
+			} else {
+				User user = userRepository.findByEmail(userVerificationDto.getEmail());
+				return Util.oneDataToMap("seq", user.getSeq().toString());
+			}
+		} else {
+			throw new ExpiredDataException("만료된 코드.");
+		}
 	}
 
 }
